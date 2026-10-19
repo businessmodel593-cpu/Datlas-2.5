@@ -1,0 +1,38 @@
+# Datlas 2.5 Model Configurations (Frontier-style)
+# Similar to GPT-2 / Llama scaling laws
+
+small:
+  vocab_size: 50257
+  d_model: 768
+  n_layers: 12
+  n_heads: 12
+  d_ff: 3072
+  max_seq_len: 1024
+  dropout: 0.1
+
+medium:
+  vocab_size: 50257
+  d_model: 1024
+  n_layers: 24
+  n_heads: 16
+  d_ff: 4096
+  max_seq_len: 2048
+  dropout: 0.1
+
+large:
+  vocab_size: 50257
+  d_model: 1536
+  n_layers: 36
+  n_heads: 24
+  d_ff: 6144
+  max_seq_len: 4096
+  dropout: 0.1
+
+# Training hyperparameters
+training:
+  lr: 3e-4
+  weight_decay: 0.1
+  warmup_steps: 2000
+  max_steps: 100000
+  grad_clip: 1.0
+  batch_size: 8  # per device

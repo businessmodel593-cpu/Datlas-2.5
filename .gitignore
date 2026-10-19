@@ -1,0 +1,15 @@
+# Data and weights (DO NOT PUSH)
+datasets/
+datlas-2.5-independent-model/
+datlas-2.5-final/
+datlas_2.5_scratch_checkpoints/
+checkpoint-*/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pt
+*.pth
+*.bin
+.pytest_cache/
+.ipynb_checkpoints/

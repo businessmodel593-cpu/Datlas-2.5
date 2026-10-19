@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f2f6f1">
+  <title>Datlas | Chat</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172b2a;
+      --muted: #687876;
+      --line: #d8e1dc;
+      --paper: #f2f6f1;
+      --surface: #fbfcf8;
+      --forest: #174c43;
+      --forest-dark: #113a33;
+      --mint: #dcece3;
+      --coral: #d96f4e;
+      --white: #fff;
+      font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      height: 100vh;
+      height: 100dvh;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image: linear-gradient(rgba(23, 76, 67, .035) 1px, transparent 1px), linear-gradient(90deg, rgba(23, 76, 67, .035) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    button, textarea { font: inherit; }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 248px minmax(0, 1fr);
+      width: min(1440px, 100%);
+      height: 100%;
+      margin: 0 auto;
+      padding: 18px;
+      gap: 14px;
+    }
+
+    .rail {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      padding: 22px 16px 16px;
+      border: 1px solid var(--line);
+      background: rgba(251, 252, 248, .88);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      margin: 0 0 30px 4px;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 35px;
+      height: 35px;
+      place-items: center;
+      color: #f7fbf6;
+      background: var(--forest);
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 9px;
+    }
+
+    .brand-name { font-size: 17px; font-weight: 700; }
+    .brand-version { margin-top: 2px; color: var(--muted); font-size: 11px; }
+
+    .new-chat {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 42px;
+      border: 1px solid var(--forest);
+      border-radius: 5px;
+      color: var(--white);
+      background: var(--forest);
+      cursor: pointer;
+      transition: background .16s ease, transform .16s ease;
+    }
+
+    .new-chat:hover { background: var(--forest-dark); }
+    .new-chat:active { transform: translateY(1px); }
+    .new-chat .plus { font-size: 19px; line-height: 1; }
+
+    .rail-label {
+      margin: 28px 4px 10px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .local-note {
+      margin-top: auto;
+      padding: 13px 12px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .local-note strong { color: var(--ink); font-weight: 650; }
+
+    .workspace {
+      display: flex;
+      min-width: 0;
+      min-height: 0;
+      flex-direction: column;
+      border: 1px solid var(--line);
+      background: rgba(251, 252, 248, .96);
+    }
+
+    .topbar {
+      display: flex;
+      height: 62px;
+      flex: 0 0 62px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 25px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .topbar-title { font-size: 14px; font-weight: 650; }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #55a67d;
+      box-shadow: 0 0 0 3px #e4f1e8;
+    }
+
+    .status.offline .status-dot { background: var(--coral); box-shadow: 0 0 0 3px #f8e8e2; }
+
+    .conversation {
+      display: flex;
+      min-height: 0;
+      flex: 1;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 28px clamp(18px, 7vw, 100px) 30px;
+      scroll-behavior: smooth;
+    }
+
+    .welcome {
+      width: min(620px, 100%);
+      margin: auto auto 25px;
+      padding: 20px 0;
+      animation: enter .35s ease both;
+    }
+
+    .welcome-kicker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 15px;
+      color: var(--forest);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .welcome-kicker::before {
+      width: 20px;
+      height: 1px;
+      background: var(--coral);
+      content: "";
+    }
+
+    .welcome h1 {
+      margin: 0 0 12px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(30px, 4vw, 43px);
+      font-weight: 400;
+      line-height: 1.08;
+    }
+
+    .welcome p {
+      max-width: 470px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 24px;
+    }
+
+    .suggestion {
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      color: #33534d;
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 12px;
+      text-align: left;
+      transition: border-color .15s ease, background .15s ease;
+    }
+
+    .suggestion:hover { border-color: #8fb3a3; background: #f0f7f1; }
+
+    .message {
+      display: grid;
+      width: min(700px, 100%);
+      grid-template-columns: 30px minmax(0, 1fr);
+      gap: 13px;
+      margin: 0 auto 22px;
+      animation: enter .22s ease both;
+    }
+
+    .avatar {
+      display: grid;
+      width: 30px;
+      height: 30px;
+      place-items: center;
+      border-radius: 7px;
+      color: var(--forest);
+      background: var(--mint);
+      font-size: 10px;
+      font-weight: 750;
+    }
+
+    .message.user .avatar { color: #80503d; background: #f4e5dc; }
+    .message-body { min-width: 0; padding-top: 3px; }
+    .message-role { margin-bottom: 5px; color: var(--muted); font-size: 11px; font-weight: 650; }
+    .message-text { color: var(--ink); font-size: 14px; line-height: 1.7; overflow-wrap: anywhere; white-space: pre-wrap; }
+    .message.user .message-text { color: #4c443f; }
+
+    .typing { display: inline-flex; gap: 4px; padding: 7px 0; }
+    .typing span { width: 5px; height: 5px; border-radius: 50%; background: #73948a; animation: pulse 1s infinite ease-in-out; }
+    .typing span:nth-child(2) { animation-delay: .12s; }
+    .typing span:nth-child(3) { animation-delay: .24s; }
+
+    .sources { margin-top: 13px; border-top: 1px solid #e2e8e4; }
+    .sources summary { padding: 10px 0 4px; color: var(--forest); cursor: pointer; font-size: 11px; font-weight: 650; }
+    .source-item { padding: 9px 0; border-bottom: 1px solid #e8ede9; }
+    .source-link { color: var(--forest); font-size: 12px; font-weight: 650; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    .source-link:hover { color: var(--coral); }
+    .source-snippet { margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+
+    .composer-wrap { padding: 12px clamp(18px, 7vw, 100px) 17px; }
+    .source-options { display: flex; width: min(700px, 100%); align-items: center; justify-content: flex-end; gap: 8px; margin: 0 auto 7px; color: var(--muted); font-size: 11px; }
+    .source-options input { width: 58px; height: 28px; padding: 3px 6px; border: 1px solid var(--line); border-radius: 4px; color: var(--ink); background: var(--surface); }
+    .source-options input:disabled { opacity: .55; }
+    .composer { display: flex; width: min(700px, 100%); align-items: flex-end; gap: 10px; margin: 0 auto; padding: 8px; border: 1px solid #c9d6cf; border-radius: 7px; background: var(--white); box-shadow: 0 4px 18px rgba(29, 64, 54, .06); }
+    .composer:focus-within { border-color: #6e9b88; box-shadow: 0 0 0 3px rgba(76, 136, 107, .12); }
+
+    textarea {
+      display: block;
+      width: 100%;
+      min-height: 42px;
+      max-height: 150px;
+      resize: none;
+      padding: 10px 8px;
+      border: 0;
+      outline: 0;
+      color: var(--ink);
+      background: transparent;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    textarea::placeholder { color: #87938e; }
+
+    .send {
+      display: grid;
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      place-items: center;
+      border: 0;
+      border-radius: 5px;
+      color: var(--white);
+      background: var(--forest);
+      cursor: pointer;
+      transition: background .15s ease, opacity .15s ease;
+    }
+
+    .send:hover:not(:disabled) { background: var(--forest-dark); }
+    .send:disabled { cursor: default; opacity: .42; }
+    .send svg { width: 17px; height: 17px; }
+    .hint { margin: 8px auto 0; color: #87938e; font-size: 10px; text-align: center; }
+    .hidden { display: none !important; }
+
+    @keyframes enter { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 0%, 60%, 100% { opacity: .35; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+
+    @media (max-width: 700px) {
+      .shell { display: block; padding: 0; }
+      .rail { display: none; }
+      .workspace { height: 100%; border: 0; }
+      .topbar { height: 54px; flex-basis: 54px; padding: 0 16px; }
+      .conversation { padding: 20px 17px 24px; }
+      .welcome { margin-top: auto; }
+      .composer-wrap { padding: 10px 12px max(12px, env(safe-area-inset-bottom)); }
+      .hint { font-size: 9px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail" aria-label="Chat navigation">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">D</div>
+        <div><div class="brand-name">Datlas</div><div class="brand-version">Local chat · Web RAG</div></div>
+      </div>
+      <button class="new-chat" id="new-chat" type="button"><span class="plus" aria-hidden="true">+</span> New chat</button>
+      <div class="rail-label">Workspace</div>
+      <div class="local-note"><strong>Local model required</strong><br>Place a compatible causal language model in the configured model directory before chatting.</div>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div class="topbar-title">New conversation</div>
+        <div class="status" id="status"><span class="status-dot" aria-hidden="true"></span><span id="status-text">Connecting</span></div>
+      </header>
+
+      <section class="conversation" id="conversation" aria-label="Conversation" aria-live="polite">
+        <div class="welcome" id="welcome">
+          <div class="welcome-kicker">Datlas 2.5</div>
+          <h1>What are you curious about?</h1>
+          <p>Datlas searches live sources, then synthesizes a cited answer with its local model.</p>
+          <div class="suggestions">
+            <button class="suggestion" type="button">What is retrieval-augmented generation?</button>
+            <button class="suggestion" type="button">How does Datlas use web sources?</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="composer-wrap">
+        <div class="source-options">
+          <label for="source-count">Web sources</label>
+          <input id="source-count" type="number" min="5" max="20" step="1" value="8" aria-label="Number of web sources">
+        </div>
+        <form class="composer" id="chat-form">
+          <textarea id="question" rows="1" aria-label="Message Datlas" placeholder="Message Datlas..."></textarea>
+          <button class="send" id="send" type="submit" aria-label="Send message" title="Send message" disabled>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </form>
+        <div class="hint">Enter to send · Shift + Enter for a new line</div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const conversation = document.getElementById("conversation");
+    const welcome = document.getElementById("welcome");
+    const form = document.getElementById("chat-form");
+    const input = document.getElementById("question");
+    const sourceCount = document.getElementById("source-count");
+    const sendButton = document.getElementById("send");
+    const status = document.getElementById("status");
+    const statusText = document.getElementById("status-text");
+    let busy = false;
+
+    function scrollToLatest() {
+      conversation.scrollTop = conversation.scrollHeight;
+    }
+
+    function addMessage(role, text, sources = []) {
+      const isUser = role === "You";
+      const message = document.createElement("article");
+      message.className = `message${isUser ? " user" : ""}`;
+
+      const avatar = document.createElement("div");
+      avatar.className = "avatar";
+      avatar.textContent = isUser ? "YOU" : "D";
+      avatar.setAttribute("aria-hidden", "true");
+
+      const body = document.createElement("div");
+      body.className = "message-body";
+      const label = document.createElement("div");
+      label.className = "message-role";
+      label.textContent = role;
+      const content = document.createElement("div");
+      content.className = "message-text";
+      content.textContent = text;
+      body.append(label, content);
+
+      if (sources.length) {
+        const details = document.createElement("details");
+        details.className = "sources";
+        const summary = document.createElement("summary");
+        summary.textContent = `Sources · ${sources.length}`;
+        details.append(summary);
+        sources.forEach((source) => {
+          const item = document.createElement("div");
+          item.className = "source-item";
+          const link = document.createElement("a");
+          link.className = "source-link";
+          link.textContent = source.title || "Source";
+          try {
+            const url = new URL(source.url);
+            if (url.protocol === "http:" || url.protocol === "https:") {
+              link.href = url.href;
+              link.target = "_blank";
+              link.rel = "noopener noreferrer";
+            }
+          } catch (_) {}
+          item.append(link);
+          if (source.snippet) {
+            const snippet = document.createElement("div");
+            snippet.className = "source-snippet";
+            snippet.textContent = source.snippet;
+            item.append(snippet);
+          }
+          details.append(item);
+        });
+        body.append(details);
+      }
+
+      message.append(avatar, body);
+      conversation.append(message);
+      scrollToLatest();
+      return message;
+    }
+
+    function addTyping() {
+      const message = addMessage("Datlas", "");
+      const content = message.querySelector(".message-text");
+      content.classList.add("typing");
+      content.setAttribute("aria-label", "Datlas is working");
+      content.innerHTML = "<span></span><span></span><span></span>";
+      return message;
+    }
+
+    async function submitQuestion(question) {
+      const trimmed = question.trim();
+      if (!trimmed || busy) return;
+      busy = true;
+      sendButton.disabled = true;
+      const maxSources = Math.min(20, Math.max(5, Number.parseInt(sourceCount.value, 10) || 8));
+      sourceCount.value = String(maxSources);
+      welcome.classList.add("hidden");
+      addMessage("You", trimmed);
+      const pending = addTyping();
+      input.value = "";
+      resizeInput();
+
+      try {
+        const response = await fetch("/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question: trimmed, max_sources: maxSources })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || "The request could not be completed.");
+        pending.remove();
+        const answer = typeof data.answer === "string" && data.answer.trim()
+          ? data.answer.trim()
+          : "Datlas did not generate a text answer this time. You can still inspect the retrieved sources below.";
+        addMessage("Datlas", answer, data.sources || []);
+      } catch (error) {
+        pending.remove();
+        addMessage("Datlas", `Datlas couldn't answer this request. ${error.message}`);
+      } finally {
+        busy = false;
+        sendButton.disabled = !input.value.trim();
+        input.focus();
+      }
+    }
+
+    function resizeInput() {
+      input.style.height = "auto";
+      input.style.height = `${Math.min(input.scrollHeight, 150)}px`;
+      sendButton.disabled = busy || !input.value.trim();
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      submitQuestion(input.value);
+    });
+
+    input.addEventListener("input", resizeInput);
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        form.requestSubmit();
+      }
+    });
+
+    document.getElementById("new-chat").addEventListener("click", () => {
+      conversation.replaceChildren(welcome);
+      welcome.classList.remove("hidden");
+      document.querySelector(".topbar-title").textContent = "New conversation";
+      input.value = "";
+      resizeInput();
+      input.focus();
+    });
+
+    document.querySelectorAll(".suggestion").forEach((button) => {
+      button.addEventListener("click", () => submitQuestion(button.textContent));
+    });
+
+    fetch("/health").then((response) => {
+      if (!response.ok) throw new Error("offline");
+      return response.json();
+    }).then((data) => {
+      if (data.generation_ready) {
+        statusText.textContent = `${data.model || "Local model"} ready`;
+        input.disabled = false;
+        sourceCount.disabled = false;
+      } else {
+        status.classList.add("offline");
+        statusText.textContent = "Local model unavailable";
+        input.disabled = true;
+        sourceCount.disabled = true;
+        input.placeholder = "Configure DATLAS_MODEL_DIR to enable chat";
+        welcome.querySelector("p").textContent = data.model_error || "A local Transformers model directory is required before chat can start.";
+      }
+    }).catch(() => {
+      status.classList.add("offline");
+      statusText.textContent = "Service unavailable";
+    });
+  </script>
+</body>
+</html>

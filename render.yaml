@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: datlas-2.5
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: "8000"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: VECTOR_STORE_PATH
+        value: ".datlas_vectors"
+    autoDeploy: true
